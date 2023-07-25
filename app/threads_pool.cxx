@@ -27,52 +27,60 @@ CThreadPool::~CThreadPool() {}
 int CThreadPool::SendMessage(const std::string &body, ConnNode *message_info)
 {
     int sockfd = message_info->sockfd;
-    /*获取报文缓存区*/
-    auto message = message_info->malloc_memory(body.size() + sizeof(COMM_PKG_HEADER) + 1);
-
-    /*填充包头*/
+    int len = 0, have_send = 0;
+    std::shared_ptr<char[]> message;
     COMM_PKG_HEADER pack_header;
-    pack_header.crc32 = htonl(1024);
-    pack_header.messageCode = htons(7);
-    pack_header.packageLength = htons(body.size() + sizeof(COMM_PKG_HEADER) + 1);
+    if (g_isset_header == true)
+    {
+        /*获取报文缓存区*/
+        message = message_info->malloc_memory(body.size() + sizeof(COMM_PKG_HEADER) + 1);
+        /*填充包头*/
+        pack_header.crc32 = htonl(1024);
+        pack_header.messageCode = htons(7);
+        pack_header.packageLength = htons(body.size() + sizeof(COMM_PKG_HEADER) + 1);
+        len = ntohs(pack_header.packageLength);
 
-    /**********   version 1  ***********
-    cout<<"pkg_len sizeof(COMM_PKG_HEADER) + message.size(): "<<sizeof(COMM_PKG_HEADER) + message.size()<<endl;
-    cout<<"sizeof(COMM_PKG_HEADER): " <<sizeof(COMM_PKG_HEADER)<<" message.size(): "<<message.size()<<endl;
+        /**********   version 1  ***********
+        cout<<"pkg_len sizeof(COMM_PKG_HEADER) + message.size(): "<<sizeof(COMM_PKG_HEADER) + message.size()<<endl;
+        cout<<"sizeof(COMM_PKG_HEADER): " <<sizeof(COMM_PKG_HEADER)<<" message.size(): "<<message.size()<<endl;
 
-    char *c_header = (char *)&pack_header;
-    // 组合包头和包体
-    std::string send_buf(c_header, sizeof(COMM_PKG_HEADER));
-    send_buf += message;
-    const char *c_send_buf = send_buf.c_str();
+        char *c_header = (char *)&pack_header;
+        // 组合包头和包体
+        std::string send_buf(c_header, sizeof(COMM_PKG_HEADER));
+        send_buf += message;
+        const char *c_send_buf = send_buf.c_str();
 
-    // 解析
-    LP_COMM_PKG_HEADER header_get = LP_COMM_PKG_HEADER(c_send_buf);
-    cout<<"pack_header.crc32: "<<ntohl(header_get->crc32)<<endl;;
-    cout<<"pack_header.messageCode: "<<ntohs(header_get->messageCode)<<endl;;
-    char *body = (char *)c_send_buf + sizeof(COMM_PKG_HEADER);
-    cout<<"body: "<<body<<endl;
-    ********************/
+        // 解析
+        LP_COMM_PKG_HEADER header_get = LP_COMM_PKG_HEADER(c_send_buf);
+        cout<<"pack_header.crc32: "<<ntohl(header_get->crc32)<<endl;;
+        cout<<"pack_header.messageCode: "<<ntohs(header_get->messageCode)<<endl;;
+        char *body = (char *)c_send_buf + sizeof(COMM_PKG_HEADER);
+        cout<<"body: "<<body<<endl;
+        ********************/
 
-    /********** version 2 ***********/
-    // vector<char> send_buf(sizeof(COMM_PKG_HEADER) + message.size());
-    // memcpy(send_buf.data(), &pack_header, sizeof(COMM_PKG_HEADER));
-    // memcpy(send_buf.data() + sizeof(COMM_PKG_HEADER), message.c_str(), message.size());
-    // char *c_send_buf = send_buf.data();
+        /********** version 2 ***********/
+        // vector<char> send_buf(sizeof(COMM_PKG_HEADER) + message.size());
+        // memcpy(send_buf.data(), &pack_header, sizeof(COMM_PKG_HEADER));
+        // memcpy(send_buf.data() + sizeof(COMM_PKG_HEADER), message.c_str(), message.size());
+        // char *c_send_buf = send_buf.data();
 
-    /********** version 3 ***********/
-    memcpy(message.get(), &pack_header, sizeof(COMM_PKG_HEADER));
-    memcpy(message.get() + sizeof(COMM_PKG_HEADER), body.c_str(), body.size() + 1);
+        /********** version 3 ***********/
+        memcpy(message.get(), &pack_header, sizeof(COMM_PKG_HEADER));
+        memcpy(message.get() + sizeof(COMM_PKG_HEADER), body.c_str(), body.size() + 1);
+
+        /*在接收端，解析报文
+        LP_COMM_PKG_HEADER header_get = (LP_COMM_PKG_HEADER)send_buf.data();
+        cout<<"pack_header.crc32: "<<ntohl(header_get->crc32)<<endl;;
+        cout<<"pack_header.messageCode: "<<ntohs(header_get->messageCode)<<endl;;*/
+    }
+    else
+    {
+        message = message_info->malloc_memory(body.size());
+        memcpy(message.get(), body.c_str(), body.size() + 1);
+        len = body.size();
+    }
+
     char *c_send_buf = message.get();
-
-    /*在接收端，解析报文
-    LP_COMM_PKG_HEADER header_get = (LP_COMM_PKG_HEADER)send_buf.data();
-    cout<<"pack_header.crc32: "<<ntohl(header_get->crc32)<<endl;;
-    cout<<"pack_header.messageCode: "<<ntohs(header_get->messageCode)<<endl;;*/
-
-    int have_send = 0;
-    int len = ntohs(pack_header.packageLength);
-    // printf("socket send: %d\n", sockfd);
     while (1)
     {
         int bytes_write = send(sockfd, c_send_buf, len, 0);
@@ -88,10 +96,9 @@ int CThreadPool::SendMessage(const std::string &body, ConnNode *message_info)
     }
 }
 
-
 void *CThreadPool::ThreadFunc(void *ThreadData)
 {
-    //extern int g_epoll_fd;
+    // extern int g_epoll_fd;
     ThreadItem *lpthread = (ThreadItem *)ThreadData;
     CThreadPool *lpThreadPool = lpthread->_pThis;
 
@@ -126,12 +133,12 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
         --lpThreadPool->m_curMsgNum; // 消息数 -1
         // printf("get ok fd: %d\n", send_node_info->sockfd);
         err = pthread_mutex_unlock(&m_pthreadMutex); // 解锁互斥量
-        if(err!=0)
+        if (err != 0)
             printf("ThreadFunc(void *ThreadData),pthread_mutex_unlock调用失败,错误码:%d !\n", err);
 
         /*[处理用户需求]*/
 
-        const std::string body = "hellow world";
+        const std::string body = g_message;
 
         // 当前正处理业务线程数+1
         ++lpThreadPool->m_isRunningThreadNum;
@@ -144,7 +151,7 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
         if (have_send == -1)
         {
             printf("send error return :%d\n", have_send);
-            if(send_node_info != nullptr)
+            if (send_node_info != nullptr)
                 g_net.close_conn(g_epoll_fd, send_node_info);
         }
         else
@@ -167,11 +174,15 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
              * EPOLLOUT 事件，而不是真正需要写数据的时候才处理，
              * 这样可能会降低效率。所以，一般建议使用 ET 模式，并按需注册 EPOLLOUT 事件
              */
-            struct epoll_event event;
-            event.events = EPOLLIN | EPOLLET | EPOLLERR;
-            int socket_fd = send_node_info->sockfd;
-            event.data.ptr = (void *)send_node_info;
-            epoll_ctl(g_epoll_fd, EPOLL_CTL_MOD, socket_fd, &event);
+
+            if (g_isrecv_msg == true)
+            {
+                struct epoll_event event;
+                event.events = EPOLLIN | EPOLLET | EPOLLERR;
+                int socket_fd = send_node_info->sockfd;
+                event.data.ptr = (void *)send_node_info;
+                epoll_ctl(g_epoll_fd, EPOLL_CTL_MOD, socket_fd, &event);
+            }
         }
 
         /**
@@ -227,15 +238,15 @@ void CThreadPool::ProcessDataAndSignal(ConnNode *fd_node)
 {
     int err;
     err = pthread_mutex_lock(&m_pthreadMutex);
-    if (err != 0)
+    if (err != 0 && g_shutdown != true)
     {
         printf("ProcessDataAndSignal(char* _cMsg)中,pthread_mutex_lock,错误码%d !!!\n", err);
     }
     m_msgSendQueue.push_back(fd_node); // 入消息队列
     // printf("in ok fd: %d\n", m_msgSendQueue.back()->sockfd);
-    ++m_curMsgNum;                                // 消息数 +1
+    ++m_curMsgNum; // 消息数 +1
     err = pthread_mutex_unlock(&m_pthreadMutex);
-    if (err != 0)
+    if (err != 0 && g_shutdown != true)
     {
         printf("ProcessDataAndSignal(char* _cMsg)中,pthread_mutex_unlock,错误码%d !!!\n", err);
     }

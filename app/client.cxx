@@ -16,6 +16,10 @@ int thread_num = 10;
 int max_conn = 3000;
 bool g_shutdown = false;
 bool g_release_over = false;
+bool g_isset_header = true;
+bool g_isrecv_msg = true;
+
+std::string g_message = "say hellow world";
 CThreadPool g_thread_pool;
 Connections *g_conn_pool = Connections::get_instance();
 static void handle_trem(int sig)

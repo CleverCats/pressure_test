@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/root/cmake_test/pressure_test_project/client_normal_pointer_node/include
+CXX_INCLUDES = -I/root/cmake_test/gitgraph_learn/pressure_test/include
 
 CXX_FLAGS = 
 
