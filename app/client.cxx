@@ -38,7 +38,7 @@ static void handle_trem(int sig)
 }
 int main(int argc, char *argv[])
 {
-    std::cout << "is ok" << std::endl;
+    // std::cout << "is ok" << std::endl;
     signal(SIGTERM, handle_trem);
 
     g_conn_pool->init_pool(20);
