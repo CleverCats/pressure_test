@@ -1,4 +1,4 @@
-# Install script for directory: /root/cmake_test/pressure_test_project/client_normal_pointer_node
+# Install script for directory: /root/cmake_test/gitgraph_learn/pressure_test
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/root/cmake_test/pressure_test_project/client_normal_pointer_node/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/root/cmake_test/gitgraph_learn/pressure_test/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

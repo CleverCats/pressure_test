@@ -105,7 +105,7 @@ public:
     void back_connect_node(ConnNode *node)
     {
         CLOCK NodeGetLock(&back_mutex);
-        printf("back node socket :%d\n", node->sockfd);
+        // printf("back node socket :%d\n", node->sockfd);
         if (node != nullptr)
         {
             node->init_node();

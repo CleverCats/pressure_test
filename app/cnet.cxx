@@ -24,18 +24,27 @@ int NetWork::setnonblocking(int fd)
     return old_option;
 };
 
-void NetWork::add_epoll(int epoll_fd, int fd)
+void NetWork::init_connected_sock(int epoll_fd, int fd)
 {
     //printf("add fd:%d\n",  fd);
     Connections *g_conn_pool = Connections::get_instance();
     auto fd_node = g_conn_pool->get_connect_node(fd);
 
+
     /**
+     * @brief 是否单向测压
+     * @param g_isrecv_msg: true 交互测试 false 单向测试
+     */
+    epoll_event event;
+    if(g_isrecv_msg == true)
+        event.events = EPOLLOUT | EPOLLET | EPOLLERR;
+    else
+        event.events = EPOLLOUT | EPOLLERR;
+        
+     /**
      * @brief data.fd和data.ptr 为共用体(union)的一部分,
      * 共享同一块内存空间,二者选其一使用即可
      */
-    epoll_event event;
-    event.events = EPOLLOUT | EPOLLET | EPOLLERR;
     event.data.ptr = (void *)fd_node;
     epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event);
     setnonblocking(fd);
@@ -43,7 +52,6 @@ void NetWork::add_epoll(int epoll_fd, int fd)
 
 bool NetWork::write_nbytes(ConnNode *fd_node, CThreadPool &g_thread_pool)
 {
-    int bytes_write = 0;
     // printf("write out%d bytes to socket%d\n", len, sockfd);
     g_thread_pool.ProcessDataAndSignal(fd_node);
     return true;
@@ -81,7 +89,7 @@ void NetWork::start_conn(int epoll_fd, int num, const char *ip, int port)
         {
             ++conn_succ;
             //printf("sockfd %d\n", sockfd);
-            add_epoll(epoll_fd, sockfd);
+            init_connected_sock(epoll_fd, sockfd);
         }
         else
             ++conn_err;
