@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/client.dir/app/client.cxx.o CMakeFiles/client.dir/app/cnet.cxx.o CMakeFiles/client.dir/app/connection_pool.cxx.o CMakeFiles/client.dir/app/crc_32.cxx.o CMakeFiles/client.dir/app/threads_pool.cxx.o -o ../client 
