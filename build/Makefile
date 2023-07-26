@@ -177,6 +177,30 @@ app/cnet.cxx.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/app/cnet.cxx.s
 .PHONY : app/cnet.cxx.s
 
+app/conf.o: app/conf.cxx.o
+.PHONY : app/conf.o
+
+# target to build an object file
+app/conf.cxx.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/app/conf.cxx.o
+.PHONY : app/conf.cxx.o
+
+app/conf.i: app/conf.cxx.i
+.PHONY : app/conf.i
+
+# target to preprocess a source file
+app/conf.cxx.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/app/conf.cxx.i
+.PHONY : app/conf.cxx.i
+
+app/conf.s: app/conf.cxx.s
+.PHONY : app/conf.s
+
+# target to generate assembly for a file
+app/conf.cxx.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/app/conf.cxx.s
+.PHONY : app/conf.cxx.s
+
 app/connection_pool.o: app/connection_pool.cxx.o
 .PHONY : app/connection_pool.o
 
@@ -225,6 +249,30 @@ app/crc_32.cxx.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/app/crc_32.cxx.s
 .PHONY : app/crc_32.cxx.s
 
+app/handle_string.o: app/handle_string.cxx.o
+.PHONY : app/handle_string.o
+
+# target to build an object file
+app/handle_string.cxx.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/app/handle_string.cxx.o
+.PHONY : app/handle_string.cxx.o
+
+app/handle_string.i: app/handle_string.cxx.i
+.PHONY : app/handle_string.i
+
+# target to preprocess a source file
+app/handle_string.cxx.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/app/handle_string.cxx.i
+.PHONY : app/handle_string.cxx.i
+
+app/handle_string.s: app/handle_string.cxx.s
+.PHONY : app/handle_string.s
+
+# target to generate assembly for a file
+app/handle_string.cxx.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/app/handle_string.cxx.s
+.PHONY : app/handle_string.cxx.s
+
 app/threads_pool.o: app/threads_pool.cxx.o
 .PHONY : app/threads_pool.o
 
@@ -264,12 +312,18 @@ help:
 	@echo "... app/cnet.o"
 	@echo "... app/cnet.i"
 	@echo "... app/cnet.s"
+	@echo "... app/conf.o"
+	@echo "... app/conf.i"
+	@echo "... app/conf.s"
 	@echo "... app/connection_pool.o"
 	@echo "... app/connection_pool.i"
 	@echo "... app/connection_pool.s"
 	@echo "... app/crc_32.o"
 	@echo "... app/crc_32.i"
 	@echo "... app/crc_32.s"
+	@echo "... app/handle_string.o"
+	@echo "... app/handle_string.i"
+	@echo "... app/handle_string.s"
 	@echo "... app/threads_pool.o"
 	@echo "... app/threads_pool.i"
 	@echo "... app/threads_pool.s"

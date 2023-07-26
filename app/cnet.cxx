@@ -9,11 +9,12 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
-#include "cnet.h"
 #include <string>
+#include "cnet.h"
 #include "threads_pool.h"
 #include "global.h"
 #include "connection_pool.h"
+#include "conf.h"
 
 static int pool_node = 0;
 int NetWork::setnonblocking(int fd)
@@ -33,10 +34,11 @@ void NetWork::init_connected_sock(int epoll_fd, int fd)
 
     /**
      * @brief 是否单向测压
-     * @param g_isrecv_msg: true 交互测试 false 单向测试
+     * @param isrecv_msg: true 交互测试 false 单向测试
      */
     epoll_event event;
-    if(g_isrecv_msg == true)
+
+    if(g_net.isrecv_msg == true)
         event.events = EPOLLOUT | EPOLLET | EPOLLERR;
     else
         event.events = EPOLLOUT | EPOLLERR;
@@ -104,3 +106,15 @@ void NetWork::close_conn(int epoll_fd, ConnNode *fd_info)
     epoll_ctl(epoll_fd,EPOLL_CTL_DEL,fd_info->sockfd,0);
     instance->back_connect_node(fd_info);
 };
+
+void NetWork::init_config()
+{
+    CConfig *g_conf_device = CConfig::GetInstance();
+    if(g_conf_device->Load("client.conf") == false)
+        assert(false);
+        
+    max_conn = g_conf_device->GetIntDefault("Max_Conn", 3000);
+    isrecv_msg = g_conf_device->GetIntDefault("Is_Recv_Msg", 1) == 1 ? true : false;
+    thread_num = g_conf_device->GetIntDefault("Thread_Num", 10);
+    isset_header = g_conf_device->GetIntDefault("Is_SetHeader", 10) == 1 ? true : false;
+}

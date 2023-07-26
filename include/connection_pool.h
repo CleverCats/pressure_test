@@ -75,7 +75,7 @@ public:
         }
     };
 
-    void init_pool(size_t pool_size)
+    void init_pool(size_t pool_size = 20)
     {
         for (size_t i = 0; i < pool_size; i++)
         {
@@ -142,7 +142,6 @@ private:
      */
     void extend_pool(size_t extend_size)
     {
-        printf("extend\n");
         for (size_t i = 0; i < extend_size; i++)
         {
             conns_pool.push_back(new ConnNode());

@@ -30,7 +30,7 @@ int CThreadPool::SendMessage(const std::string &body, ConnNode *message_info)
     int len = 0, have_send = 0;
     std::shared_ptr<char[]> message;
     COMM_PKG_HEADER pack_header;
-    if (g_isset_header == true)
+    if (g_net.isset_header == true)
     {
         /*获取报文缓存区*/
         message = message_info->malloc_memory(body.size() + sizeof(COMM_PKG_HEADER) + 1);
@@ -98,7 +98,6 @@ int CThreadPool::SendMessage(const std::string &body, ConnNode *message_info)
 
 void *CThreadPool::ThreadFunc(void *ThreadData)
 {
-    // extern int g_epoll_fd;
     ThreadItem *lpthread = (ThreadItem *)ThreadData;
     CThreadPool *lpThreadPool = lpthread->_pThis;
 
@@ -152,12 +151,13 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
         {
             printf("send error return :%d\n", have_send);
             if (send_node_info != nullptr)
-                g_net.close_conn(g_epoll_fd, send_node_info);
+                g_net.close_conn(g_net.epoll_fd, send_node_info);
         }
         else
         {
             printf("报文数: %d socked: %d successful send massage len : %d bytes thread id: %lu \n",
-                   ++msg_count, send_node_info->sockfd, have_send, pthread_self());
+                ++msg_count, send_node_info->sockfd, have_send, pthread_self());
+            
             if (msg_count > 100000)
             {
                 /**
@@ -175,13 +175,13 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
              * 这样可能会降低效率。所以，一般建议使用 ET 模式，并按需注册 EPOLLOUT 事件
              */
 
-            if (g_isrecv_msg == true)
+            if (g_net.isrecv_msg == true)
             {
                 struct epoll_event event;
                 event.events = EPOLLIN | EPOLLET | EPOLLERR;
                 int socket_fd = send_node_info->sockfd;
                 event.data.ptr = (void *)send_node_info;
-                epoll_ctl(g_epoll_fd, EPOLL_CTL_MOD, socket_fd, &event);
+                epoll_ctl(g_net.epoll_fd, EPOLL_CTL_MOD, socket_fd, &event);
             }
         }
 
