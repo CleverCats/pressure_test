@@ -15,6 +15,13 @@ class NetWork{
         void start_conn(int epoll_fd,int num,const char*ip,int port);
         void close_conn(int epoll_fd, ConnNode *fd_node);
     public:
+        /**
+         * @brief 网路配置
+         * @param isrecv_msg 是否接受服务器数据(交互测压/单项测压)
+         * @param max_conn epoll最大连接数(设置必须大于连接数)
+         * @param thread_num 线程池线程数
+         * @param epoll_fd 
+         */
         bool isrecv_msg = true;
         bool isset_header = true;
         int max_conn = 2000;

@@ -27,15 +27,8 @@ int NetWork::setnonblocking(int fd)
 
 void NetWork::init_connected_sock(int epoll_fd, int fd)
 {
-    //printf("add fd:%d\n",  fd);
     Connections *g_conn_pool = Connections::get_instance();
     auto fd_node = g_conn_pool->get_connect_node(fd);
-
-
-    /**
-     * @brief 是否单向测压
-     * @param isrecv_msg: true 交互测试 false 单向测试
-     */
     epoll_event event;
 
     if(g_net.isrecv_msg == true)

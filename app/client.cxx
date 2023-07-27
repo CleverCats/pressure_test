@@ -28,28 +28,23 @@ static void handle_trem(int sig)
      */
     for (auto online_node : g_conn_pool->online_pool)
     {
-        //printf("online_node.first: %d\n", online_node.first);
         g_net.close_conn(g_net.epoll_fd, online_node.second);
-
     }
+
     g_conn_pool->online_pool.clear();
-        
     g_conn_pool->free_all_nodes();
     g_release_over = true;
 }
 
-
 int main(int argc, char *argv[])
 {
-    
-
     signal(SIGTERM, handle_trem);
 
     g_conn_pool->init_pool();
     g_net.epoll_fd = epoll_create(g_net.max_conn);
     g_net.init_config();
     g_thread_pool.CreatThreadPool(g_net.thread_num);
-    
+
     /*scale ip port*/
     assert(argc == 4);
 
@@ -62,7 +57,6 @@ int main(int argc, char *argv[])
         // printf("========== get event: %d ===============\n", fds);
         for (int i = 0; i < fds; i++)
         {
-            // printf("ok fd: %d\n", fd_node->sockfd);
             if (events[i].events & EPOLLIN)
             {
 
