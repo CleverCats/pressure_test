@@ -1,6 +1,7 @@
 #pragma once
 
 #pragma pack(1)
+
 /* 包头结构 */
 typedef struct
 {
