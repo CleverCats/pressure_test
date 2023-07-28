@@ -13,4 +13,6 @@ typedef struct _CConfItem
 
 extern NetWork g_net;
 extern bool g_shutdown;
+extern bool g_release_over;
 extern std::string g_message;
+extern CThreadPool g_thread_pool;

@@ -12,7 +12,6 @@
 #include "struct.h"
 #include "crc_32.h"
 
-static std::atomic<int> msg_count = 0;
 pthread_mutex_t CThreadPool::m_pthreadMutex = PTHREAD_MUTEX_INITIALIZER; // 初始化线程同步锁
 pthread_cond_t CThreadPool::m_pthreadCond = PTHREAD_COND_INITIALIZER;    // 初始化条件变量
 CThreadPool::CThreadPool()
@@ -95,7 +94,6 @@ int CThreadPool::SendMessage(const std::string &body, ConnNode *message_info)
             return have_send;
     }
 }
-
 void *CThreadPool::ThreadFunc(void *ThreadData)
 {
     ThreadItem *lpthread = (ThreadItem *)ThreadData;
@@ -104,7 +102,9 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
     int err;
 
     pthread_t _tid = pthread_self(); // 获取线程id
-    printf("running thread id: %lu \n", _tid);
+    std::cout<<"\r("<< ++lpThreadPool->cur_index <<"/"<<lpThreadPool->m_ThreadNum
+             <<") "<<"running thread id:"<< _tid<<"  ";
+    std::cout.flush();
     while (true)
     {
         err = pthread_mutex_lock(&m_pthreadMutex); // 线程同步互斥
@@ -141,10 +141,7 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
 
         // 当前正处理业务线程数+1
         ++lpThreadPool->m_isRunningThreadNum;
-        // ngx_log_stderr(0,"Processing Msg Success pid = %d",getpid());
-
-        // printf("send ok fd: %d\n", send_node_info->sockfd);
-
+        // std::cout<<" thread is running: "<<lpThreadPool->m_isRunningThreadNum<<" "<<std::endl;
         // 开始处理用户需求...
         int have_send = SendMessage(body, send_node_info);
         if (have_send == -1)
@@ -155,10 +152,11 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
         }
         else
         {
-            printf("报文数: %d socked: %d successful send massage len : %d bytes thread id: %lu \n",
-                ++msg_count, send_node_info->sockfd, have_send, pthread_self());
+            // printf("报文数: %d socket: %d successful send massage len : %d bytes thread id: %lu \n",
+            //     ++msg_count, send_node_info->sockfd, have_send, pthread_self());
             
-            if (msg_count > 100000)
+            ++g_net.msg_count;
+            if (g_net.msg_count > 100000)
             {
                 /**
                  * @brief 睡眠观察交互情况
@@ -229,8 +227,8 @@ lblfor:
             goto lblfor;
         }
     }
-
-    std::cout << "业务逻辑线程池创建成功,线程数: " << m_logicthreadsQueue.size() << std::endl;
+    std::cout<<std::endl;
+    std::cout << "sacle of logic threads be created : " << m_logicthreadsQueue.size() << std::endl;
     return true;
 }
 
@@ -263,16 +261,16 @@ void CThreadPool::CallFreeThread()
         return;
     }
 
-    if (m_ThreadNum == m_isRunningThreadNum)
-    {
-        // 如果线程全部繁忙,若至少10s间出现两次,则警告
-        time_t _CurTime = time(NULL);
-        if (_CurTime - m_lastThreadEmTime > 10)
-        {
-            m_lastThreadEmTime = _CurTime;
-            printf("繁忙线程数:%d 线程全部占用中,无法及时处理用户需求...\n", (int)m_isRunningThreadNum);
-        }
-    }
+    // if (m_ThreadNum == m_isRunningThreadNum)
+    // {
+    //     // 如果线程全部繁忙,若至少10s间出现两次,则警告
+    //     time_t _CurTime = time(NULL);
+    //     if (_CurTime - m_lastThreadEmTime > 10)
+    //     {
+    //         m_lastThreadEmTime = _CurTime;
+    //         printf("繁忙线程数:%d 线程全部占用中,无法及时处理用户需求...\n", (int)m_isRunningThreadNum);
+    //     }
+    // }
     return;
 }
 
@@ -313,6 +311,7 @@ void CThreadPool::StopAllthreads()
     m_logicthreadsQueue.clear();
 
     // g_socket.ngx_clear_connectionPool();        //回收连接池内存
-    printf("StopAllthreads()调用成功线程池内存回收完毕,线程正常结束！！！\n");
+    std::cout<<std::endl;
+    std::cout<<"stop all threads over"<<std::endl;
     return;
 }

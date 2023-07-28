@@ -6,6 +6,7 @@
 #include <auto_mutex.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 #include "global.h"
 /**
  * @brief  连接池节点
@@ -24,7 +25,9 @@ struct ConnNode
     {
         if (sockfd != -1)
         {
-            printf("close socket %d\n", sockfd);
+            static int node_id;
+            std::cout<<"\r"<<"No."<< ++node_id <<") socket be closed";
+            std::cout.flush();
             close(sockfd);
             sockfd = -1;
         }
@@ -90,15 +93,18 @@ public:
         // printf("fd:%d\n", fd);
         if (conns_pool.size() == 0)
             return nullptr;
-
-        if (conns_pool.size() < conns_pool.capacity() / 2)
-            extend_pool(conns_pool.size() / 3 + 1);
+        // printf("conns_pool.capacity(): %d\n", conns_pool.capacity());
+        // printf("conns_pool.size(): %d\n", conns_pool.size());
+        if (conns_pool.size() < 20)
+            extend_pool(conns_pool.size() / 2 + 1);
 
         auto res = conns_pool.back();
         res->sockfd = fd;
 
         conns_pool.pop_back();
         online_pool.insert(std::pair<int, ConnNode *>(res->sockfd, res));
+        
+        
         return res;
     }
 
@@ -116,7 +122,8 @@ public:
 
     void free_all_nodes()
     {
-        printf("conns_pool.size():%lu\n", conns_pool.size());
+        std::cout<<std::endl;
+        std::cout<<"conns_pool size: "<<conns_pool.size()<<std::endl;
         /**
          * @brief 回收连接池
          */
@@ -127,7 +134,7 @@ public:
                 delete *node;
             }
         }
-        printf("free_all_nodes over\n");
+        std::cout<<"all nodes have been freed rightly"<<std::endl;;
     }
     size_t get_pool_size()
     {
@@ -142,6 +149,7 @@ private:
      */
     void extend_pool(size_t extend_size)
     {
+        // printf("extend\n");
         for (size_t i = 0; i < extend_size; i++)
         {
             conns_pool.push_back(new ConnNode());
@@ -151,9 +159,9 @@ private:
 private:
     pthread_mutex_t pool_mutex; // 刷新锁
     pthread_mutex_t back_mutex; // 回归锁
-    std::vector<ConnNode *> conns_pool;
     static Connections *pool_instance;
 
 public:
+    std::vector<ConnNode *> conns_pool;
     std::multimap<int, ConnNode *> online_pool;
 };

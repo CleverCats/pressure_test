@@ -52,4 +52,5 @@ public:
     int m_curMsgNum;                      // 消息队列项数
     std::list<ConnNode *> m_msgSendQueue; // 发消息队列
     int epoll_fd;
+    int cur_index = 0;                    // 线程索引
 };
