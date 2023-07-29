@@ -102,8 +102,9 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
     int err;
 
     pthread_t _tid = pthread_self(); // 获取线程id
-    std::cout<<"\r("<< ++lpThreadPool->cur_index <<"/"<<lpThreadPool->m_ThreadNum
-             <<") "<<"running thread id:"<< _tid<<"  ";
+    std::cout << "\r(" << ++lpThreadPool->cur_index << "/" << lpThreadPool->m_ThreadNum
+              << ") "
+              << "running thread id:" << _tid << "  ";
     std::cout.flush();
     while (true)
     {
@@ -154,7 +155,7 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
         {
             // printf("报文数: %d socket: %d successful send massage len : %d bytes thread id: %lu \n",
             //     ++msg_count, send_node_info->sockfd, have_send, pthread_self());
-            
+
             ++g_net.msg_count;
             if (g_net.msg_count > 100000)
             {
@@ -227,7 +228,7 @@ lblfor:
             goto lblfor;
         }
     }
-    std::cout<<std::endl;
+    std::cout << std::endl;
     std::cout << "sacle of logic threads be created : " << m_logicthreadsQueue.size() << std::endl;
     return true;
 }
@@ -311,7 +312,7 @@ void CThreadPool::StopAllthreads()
     m_logicthreadsQueue.clear();
 
     // g_socket.ngx_clear_connectionPool();        //回收连接池内存
-    std::cout<<std::endl;
-    std::cout<<"stop all threads over"<<std::endl;
+    std::cout << std::endl;
+    std::cout << "stop all threads over" << std::endl;
     return;
 }
