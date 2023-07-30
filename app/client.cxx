@@ -40,7 +40,6 @@ int main(int argc, char *argv[])
         g_net.show_connect_info();
         for (int i = 0; i < fds; i++)
         {
-            // printf("ok fd: %d\n", fd_node->sockfd);
             if (events[i].events & EPOLLIN)
             {
                 auto fd_node = (ConnNode *)events[i].data.ptr;
