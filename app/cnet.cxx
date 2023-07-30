@@ -32,10 +32,9 @@ int NetWork::setnonblocking(int fd)
 
 void NetWork::init_connected_sock(int epoll_fd, int fd)
 {
-    //printf("add fd:%d\n",  fd);
+    // printf("add fd:%d\n",  fd);
     Connections *g_conn_pool = Connections::get_instance();
     auto fd_node = g_conn_pool->get_connect_node(fd);
-
 
     /**
      * @brief 是否单向测压
@@ -101,8 +100,8 @@ void NetWork::start_conn(int epoll_fd, int num, const char *ip, int port)
         else
             ++conn_err;
     }
-    printf("build connection: %d\n", conn_succ);
-    printf("connection error: %d\n", conn_err);
+    std::cout << "build connection: " << conn_succ;
+    std::cout << " error connection: " << conn_err << std::endl;
 };
 
 void NetWork::close_conn(int epoll_fd, ConnNode *fd_info)
@@ -127,25 +126,28 @@ void NetWork::init_config()
 
 void NetWork::show_connect_info()
 {
+    static int t = 0;
     Connections *g_conn_pool = Connections::get_instance();
     auto cur_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - g_net.last_recv_time).count();
+
     if (duration >= show_interval)
     {
-        g_net.last_recv_time = cur_time;
-        std::cout << "\ronline: " << g_conn_pool->online_pool.size() << " "
-        << "pool capacity: "<< g_conn_pool->conns_pool.capacity()<<" "<< "msg_count: "<<msg_count<<" ";
-        std::cout << "qps: " << g_net.msg_count / (duration/1000.0)<<std::endl;
-        g_net.msg_count = 0;
-        // std::cout<<" thread is running: "<<g_thread_pool.m_isRunningThreadNum<<" ";
-        std::cout.flush();
-
-        static int t = 0;
         ++t;
-        if(pressure_continue_time==show_interval*t/1000)
-            handle_trem(1);
-            /*7*2s = 14s end client*/
-            
+        if (t != 1)
+        {
+            g_net.last_recv_time = cur_time;
+            std::cout << "\ronline: " << g_conn_pool->online_pool.size() << " "
+                      << "pool capacity: " << g_conn_pool->conns_pool.capacity() << " "
+                      << "msg_count: " << msg_count << " ";
+            std::cout << "qps: " << g_net.msg_count / (duration / 1000.0);
+            g_net.msg_count = 0;
+            // std::cout<<" thread is running: "<<g_thread_pool.m_isRunningThreadNum<<" ";
+            std::cout.flush();
+            if (pressure_continue_time < show_interval * t / 1000)
+                handle_trem(1);
+            /*pressure_continue_time end client*/
+        }
     }
 }
 
@@ -153,7 +155,8 @@ void NetWork::handle_trem(int sig)
 {
     Connections *g_conn_pool = Connections::get_instance();
     g_thread_pool.StopAllthreads();
-    printf("online_pool.size():%lu\n", g_conn_pool->online_pool.size());
+    std::cout <<std::endl;
+    std::cout << "online scale: " << g_conn_pool->online_pool.size();
     /**
      * @brief 断开在线
      */
@@ -161,7 +164,6 @@ void NetWork::handle_trem(int sig)
     {
         g_net.close_conn(g_net.epoll_fd, online_node.second);
     }
-
     g_conn_pool->online_pool.clear();
     g_conn_pool->free_all_nodes();
     g_release_over = true;

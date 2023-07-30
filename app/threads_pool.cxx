@@ -229,7 +229,6 @@ lblfor:
         }
     }
     std::cout << std::endl;
-    std::cout << "sacle of logic threads be created : " << m_logicthreadsQueue.size() << std::endl;
     return true;
 }
 
@@ -311,8 +310,7 @@ void CThreadPool::StopAllthreads()
     }
     m_logicthreadsQueue.clear();
 
-    // g_socket.ngx_clear_connectionPool();        //回收连接池内存
-    std::cout << std::endl;
-    std::cout << "stop all threads over" << std::endl;
+    // std::cout << std::endl;
+    // std::cout << "stop all threads over" << std::endl;
     return;
 }

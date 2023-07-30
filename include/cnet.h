@@ -45,5 +45,5 @@ public:
     // 压测时间(s)
     int pressure_continue_time = 5;
     // 显示频率(ms)
-    int show_interval = 2000;
+    int show_interval = 1000;
 };

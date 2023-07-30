@@ -26,7 +26,7 @@ struct ConnNode
         if (sockfd != -1)
         {
             static int node_id;
-            std::cout<<"\r"<<"No."<< ++node_id <<") socket be closed";
+            std::cout<<"\r"<<"no."<< ++node_id <<") socket be closed";
             std::cout.flush();
             close(sockfd);
             sockfd = -1;
@@ -122,8 +122,7 @@ public:
 
     void free_all_nodes()
     {
-        std::cout<<std::endl;
-        std::cout<<"conns_pool size: "<<conns_pool.size()<<std::endl;
+        // std::cout<<" conns_pool size: "<<conns_pool.size()<<std::endl;
         /**
          * @brief 回收连接池
          */
@@ -134,7 +133,7 @@ public:
                 delete *node;
             }
         }
-        std::cout<<"all nodes have been freed rightly"<<std::endl;;
+        std::cout<<" all nodes have been freed rightly"<<std::endl;;
     }
     size_t get_pool_size()
     {
