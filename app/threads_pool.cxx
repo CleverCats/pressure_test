@@ -4,7 +4,6 @@
 #include <sys/socket.h>
 #include <sys/epoll.h>
 #include <arpa/inet.h> //htons
-#include <zlib.h>
 #include <string.h> //memcpy
 #include "threads_pool.h"
 #include "auto_mutex.h"
@@ -104,7 +103,7 @@ void *CThreadPool::ThreadFunc(void *ThreadData)
     pthread_t _tid = pthread_self(); // 获取线程id
     std::cout << "\r(" << ++lpThreadPool->cur_index << "/" << lpThreadPool->m_ThreadNum
               << ") "
-              << "running thread id:" << _tid << "  ";
+              << "running thread id:" << _tid << " ";
     std::cout.flush();
     while (true)
     {

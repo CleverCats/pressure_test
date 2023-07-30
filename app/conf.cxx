@@ -29,7 +29,7 @@ CConfig::~CConfig()
 bool CConfig::Load(const char *pconfName)
 {
 	FILE *fp;
-	const char *file_path = "/root/cmake_test/gitgraph_learn/pressure_test/client.conf";
+	const char *file_path = "/home/pressure_test/client.conf";
 	pconfName = file_path;
 	fp = fopen(pconfName, "r");
 	if (fp == NULL)

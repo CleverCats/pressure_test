@@ -130,7 +130,6 @@ void NetWork::show_connect_info()
     Connections *g_conn_pool = Connections::get_instance();
     auto cur_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - g_net.last_recv_time).count();
-
     if (duration >= show_interval)
     {
         ++t;

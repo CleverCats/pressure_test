@@ -39,7 +39,7 @@ public:
     // epoll_creat fd
     int epoll_fd = 0;
     // 业务处理数
-    std::atomic<int> msg_count = 0;
+    std::atomic<int> msg_count{0};
     // 上次发包时间
     std::chrono::time_point<std::chrono::high_resolution_clock> last_recv_time;
     // 压测时间(s)

@@ -1,3 +1,0 @@
-/root/cmake_test/gitgraph_learn/pressure_test/build/CMakeFiles/client.dir
-/root/cmake_test/gitgraph_learn/pressure_test/build/CMakeFiles/edit_cache.dir
-/root/cmake_test/gitgraph_learn/pressure_test/build/CMakeFiles/rebuild_cache.dir

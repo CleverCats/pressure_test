@@ -21,3 +21,5 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
 # 添加可执行文件
 add_executable(client ${APP_SRC})
 
+# 链接编译项
+target_link_libraries(client pthread)

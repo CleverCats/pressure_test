@@ -36,7 +36,6 @@ int main(int argc, char *argv[])
     while (!g_release_over)
     {
         int fds = epoll_wait(g_net.epoll_fd, events, 1000, -1);
-        // printf("========== get event: %d ===============\n", fds);
         g_net.show_connect_info();
         for (int i = 0; i < fds; i++)
         {
